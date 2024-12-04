@@ -2,6 +2,7 @@
   <header
     v-if="!aboveMediumBP"
     ref="header"
+    id="mobile-header"
     class="sticky top-0 z-50 h-12 w-full bg-layer-2 drop-shadow-md duration-500"
   >
     <div class="h-full">
@@ -29,10 +30,12 @@
             />
             <DropdownCreate
               v-if="userIsSignedIn"
+              id="create"
               class="w-full"
               :location="DropdownLocation.SIDE_MENU"
             />
             <DropdownInfo
+              id="user-options"
               class="w-full"
               :location="DropdownLocation.SIDE_MENU"
             />
