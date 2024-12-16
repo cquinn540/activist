@@ -12,15 +12,13 @@ type TestFixtures = {
 export const test = baseTest.extend<TestFixtures>({
   landingPage: async ({ page }, use) => {
     const landingPage = new LandingPage(page);
-    await landingPage.navigateTo("/en");
+    await landingPage.page.goto("/en");
     await landingPage.landingSplash.waitFor({ state: "visible" });
     await use(landingPage);
   },
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
-    await homePage.navigateTo("/home");
-    const topics = homePage.topics;
-    await topics.dropdown.waitFor({ state: "visible" });
+    await homePage.page.goto("/home");
     await use(homePage);
   },
   signInPage: async ({ page }, use) => {

@@ -2,47 +2,39 @@ import { expect, test } from "../fixtures/test-fixtures";
 import { runAccessibilityTest } from "../utils/accessibilityTesting";
 
 test.describe("Home Page", () => {
-  test("The topics dropdown should be functional", async ({ homePage }) => {
-    await homePage.checkTopicsDropdownFunctionality();
+  test("Topics filter should expand or hide on click", async ({ homePage }) => {
+    const topicsFilter = homePage.getTopicsFilter();
+    await topicsFilter.click();
+    await expect(topicsFilter.getByRole("listbox")).toBeVisible();
+
+    await topicsFilter.click();
+    await expect(topicsFilter.getByRole("listbox")).toBeHidden();
   });
 
-  test("The sidebar should be visible on desktop", async ({ homePage }) => {
+  test("SidebarLeft should expand and collapse on hover", async ({
+    homePage,
+  }) => {
     const isMobile = await homePage.isMobile();
-    test.skip(isMobile, "This test is only for desktop");
+    test.skip(isMobile, "SidebarLeft only shows on desktop");
 
-    const isVisible = await homePage.checkSidebarVisibilityOnDesktop();
-    expect(isVisible).toBe(true);
+    const sidebarLeft = homePage.getSidebarLeft();
+    sidebarLeft.testExpandAndCollapse();
   });
 
-  test("The sidebar should expand and collapse when hovered over", async ({
+  test("Navigation main options: Events, Organizations and Home", async ({
     homePage,
   }) => {
-    const results = await homePage.checkSidebarExpandCollapse();
-    results.forEach((result) => expect(result).toBe(true));
+    const isMobile = await homePage.isMobile();
+    const mainNavOptions = homePage.getMainNavOptions(isMobile);
+    await mainNavOptions.testEachLink();
   });
 
-  test("Navigation dropdown menus should be functional", async ({
+  test("Navigation sub options: Info and Join activist", async ({
     homePage,
   }) => {
-    const results = await homePage.checkNavigationMenus();
-    results.forEach((result) => expect(result).toBe(true));
-  });
-
-  test("Navigation links should be functional", async ({ homePage }) => {
-    const results = await homePage.checkNavigationLinks();
-    const expectedPaths = [
-      "/organizations",
-      "/home",
-      "/events",
-      "/help",
-      "/docs",
-      "/legal",
-      "/auth/sign-in",
-      "/auth/sign-up",
-    ];
-    results.forEach((url, index) =>
-      expect(url).toContain(expectedPaths[index])
-    );
+    const isMobile = await homePage.isMobile();
+    const SubNavOptions = homePage.getSubNavOptions(isMobile);
+    await SubNavOptions.testEachLink();
   });
 
   test("Hot keys should function correctly", async ({ homePage }) => {

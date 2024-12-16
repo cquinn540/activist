@@ -1,62 +1,53 @@
 import type { Page, Locator } from "@playwright/test";
-import { PageObjectBase } from "../utils/PageObjectBase";
-import { Navigation } from "./Navigation";
+import { expect } from "~/test-e2e/fixtures/test-fixtures";
 
-const locators = {
-  SIDEBAR_LEFT: "#sidebar-left",
-  SIDEBAR_LEFT_TOGGLE: "#sidebar-left-toggle",
-  SIDEBAR_LEFT_INFO: "#info button",
-};
+export class SidebarLeft {
+  public static ID: "#sidebar-left";
 
-export class SidebarLeft extends PageObjectBase {
-  constructor(page: Page) {
-    super(page, locators);
-    this.nav = new Navigation(page);
+  public readonly locator: Locator;
+  public readonly lockToggle: Locator;
+  private readonly page;
+
+  constructor(locator: Locator, page: Page) {
+    this.locator = locator;
+    this.page = page;
+    this.lockToggle = this.locator.getByRole("button", {
+      name: /expand or collapse the left sidebar/i,
+    });
   }
 
-  get component(): Locator {
-    return this.getLocator("SIDEBAR_LEFT");
-  }
-  get sidebarLeftToggle(): Locator {
-    return this.getLocator("SIDEBAR_LEFT_TOGGLE");
+  async isCollapsed(message?: string): Promise<void> {
+    await expect(this.locator, message).toHaveClass("w-16");
   }
 
-  // click on the sidebar left toggle
-  async clickSidebarLeftToggle(): Promise<void> {
-    await this.sidebarLeftToggle.click();
+  async isExpanded(message?: string): Promise<void> {
+    await expect(this.locator, message).toHaveClass("w-50");
   }
 
-  // is sidebar left sticky expanded (has class -rotate-180)
-  async isSidebarLeftToggleExpanded(): Promise<boolean> {
-    const toggleClass = await this.sidebarLeftToggle.getAttribute("class");
-    return toggleClass?.includes("-rotate-180") ?? false;
+  async isLockedOpen(message?: string): Promise<void> {
+    await expect(this.locator, message).toHaveClass("-rotate-180");
   }
 
-  // is sidebar left collapsed (does not have class -rotate-180)
-  async isSidebarLeftToggleCollapsed(): Promise<boolean> {
-    const toggleClass = await this.sidebarLeftToggle.getAttribute("class");
-    return toggleClass?.includes("pb-1 pl-0.5") ?? false;
+  async isUnlocked(message?: string): Promise<void> {
+    await expect(this.locator, message).not.toHaveClass("-rotate-180");
   }
 
-  async collapseSidebar(): Promise<void> {
-    const isExpanded = await this.isSidebarLeftToggleExpanded();
-    if (isExpanded) {
-      await this.clickSidebarLeftToggle();
-      await this.hoverOutsideSidebar();
-      await this.page.waitForSelector("#sidebar-left.w-16", {
-        state: "attached",
-      });
-    }
+  async hover(): Promise<void> {
+    await this.locator.hover();
   }
 
-  // hover over the sidebar left
-  async hoverSidebarLeft(): Promise<void> {
-    await this.component.hover();
+  async mouseEnter(): Promise<void> {
+    // determine the the width of the visible sidebar
+    const boundingBox = await this.locator.boundingBox();
+    const x = boundingBox?.x ?? 0;
+    const y = boundingBox?.y ?? 0;
+    // move mouse to the center of the sidebar
+    await this.page.mouse.move(x / 2, y / 2);
   }
 
   // hover to the right of the sidebar left
-  async hoverOutsideSidebar(): Promise<void> {
-    const boundingBox = await this.component.boundingBox();
+  async mouseLeave(): Promise<void> {
+    const boundingBox = await this.locator.boundingBox();
     if (!boundingBox) {
       throw new Error("Unable to get bounding box of SidebarLeft");
     }
@@ -70,19 +61,24 @@ export class SidebarLeft extends PageObjectBase {
     await this.page.mouse.move(outsideX, outsideY);
   }
 
-  async hoverIntoSidebarLeft(): Promise<void> {
-    // determine the the width of the visible sidebar
-    const boundingBox = await this.component.boundingBox();
-    const x = boundingBox?.x ?? 0;
-    const y = boundingBox?.y ?? 0;
-    // move mouse to the center of the sidebar
-    await this.page.mouse.move(x / 2, y / 2);
-  }
+  async testExpandAndCollapse() {
+    await this.isCollapsed("should be collapsed by default");
 
-  // is sidebar collapsed (has class w-16)
-  async isSidebarCollapsed(): Promise<boolean> {
-    return (
-      (await this.component.getAttribute("class"))?.includes("w-16") ?? false
+    await this.mouseEnter();
+    await this.isExpanded("should expand on mouse enter");
+
+    await this.lockToggle.click();
+    await this.mouseLeave();
+    await this.isLockedOpen("lock toggle button should point left when locked");
+    await this.isExpanded("should stay expanded on mouse leave when locked");
+
+    await this.mouseEnter();
+    await this.lockToggle.click();
+    await this.isUnlocked(
+      "lock toggle button should point right when unlocked"
     );
+
+    await this.mouseLeave();
+    await this.isCollapsed("should collapse on mouse leave when unlocked");
   }
 }
