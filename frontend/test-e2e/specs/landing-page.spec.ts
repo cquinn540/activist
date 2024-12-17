@@ -1,55 +1,92 @@
+import {
+  createLandingPage,
+  LandingPageMobile,
+  LandingPageWeb,
+} from "../page-objects/LandingPage";
 import { LandingPage, expect, test } from "../fixtures/test-fixtures";
 import { runAccessibilityTest } from "../utils/accessibilityTesting";
+import { ROADMAP_LINK_NAME } from "../utils/accessible-names";
+
+test.beforeEach(({ page }) => {
+  page.goto("/en");
+});
 
 test.describe("Landing Page", () => {
   // MARK: Header
 
-  // Test that the correct Header is visible on mobile or desktop.
-  test("The correct header element should be visible on mobile and desktop", async ({
-    landingPage,
-  }) => {
-    const header = await landingPage.getVisibleHeader();
-    await expect(header).toBeVisible();
+  test("Desktop layout uses desktop header", async ({ page, isMobile }) => {
+    test.skip(isMobile);
+    const landingPage = new LandingPageWeb(page);
+
+    expect(landingPage.header.root).toBeVisible();
   });
 
-  // Test that the Roadmap button is visible and clickable only on Desktop Header.
-  test("Roadmap button should be visible and clickable only on Desktop", async ({
-    landingPage,
-  }) => {
-    const result = await landingPage.checkRoadmapButtonVisibility();
-    expect(result).toBe(true);
+  test("Mobile layout uses mobile header", async ({ page, isMobile }) => {
+    test.skip(!isMobile);
+    const landingPage = new LandingPageMobile(page);
+
+    expect(landingPage.header.root).toBeVisible();
   });
 
-  // Test that the Sign In link can be accessed from the Home Page.
-  test("Sign In link should be accessible from the Home Page", async ({
-    landingPage,
-  }) => {
-    const isSignInVisible = await landingPage.isSignInButtonVisible();
-    expect(isSignInVisible).toBe(true);
+  test("Can navigate to Roadmap on desktop", async ({ page, isMobile }) => {
+    test.skip(isMobile);
+    const landingPage = new LandingPageWeb(page);
 
-    await landingPage.navigateToSignIn();
-    expect(landingPage.url()).toContain("/auth/sign-in");
+    await landingPage.header.roadmapLink.click();
+    await page.waitForURL("**/about/roadmap");
+
+    expect(page.url).toContain("/about/roadmap");
   });
 
-  // Test that the Sign Up link can be accessed from the Home Page.
-  test("Sign Up link should be accessible from the Home Page", async ({
-    landingPage,
-  }) => {
-    const isSignUpVisible = await landingPage.isSignUpButtonVisible();
-    expect(isSignUpVisible).toBe(true);
+  test("Roadmap link is not visible on mobile", async ({ page, isMobile }) => {
+    test.skip(!isMobile);
 
-    await landingPage.navigateToSignUp();
-    expect(landingPage.url()).toContain("/auth/sign-up");
+    expect(
+      page.getByRole("link", { name: ROADMAP_LINK_NAME })
+    ).not.toBeAttached();
   });
 
-  // Test that the theme dropdown is visible and functional.
-  test("Theme dropdown is functional", async ({ landingPage }) => {
-    const themes = ["light", "dark"];
+  test("Can navigate to Sign In page", async ({ page, isMobile }) => {
+    const landingPage = createLandingPage(page, isMobile);
 
-    for (const theme of themes) {
-      await landingPage.selectThemeOption(theme);
-      const currentTheme = await landingPage.currentTheme();
-      expect(currentTheme).toContain(theme);
+    await landingPage.header.clickSignInLink();
+    await page.waitForURL("**/auth/sign-in");
+
+    expect(page.url).toContain("/auth/sign-in");
+  });
+
+  test("Can navigate to Sign Up page", async ({ page, isMobile }) => {
+    const landingPage = createLandingPage(page, isMobile);
+
+    await landingPage.header.clickSignUpLink();
+    await page.waitForURL("**/auth/sign-up");
+
+    expect(page.url).toContain("/auth/sign-up");
+  });
+
+  test("Can change themes", async ({ page, isMobile }) => {
+    const landingPage = createLandingPage(page, isMobile);
+    const themeMenu = await landingPage.header.getThemeMenu();
+
+    const themes = [
+      {
+        theme: "light",
+        getOption: themeMenu.getLightThemeOption,
+      },
+      {
+        theme: "dark",
+        getOption: themeMenu.getDarkThemeOption,
+      },
+    ];
+
+    for (const { theme, getOption } of themes) {
+      await themeMenu.toggleOpenButton.click();
+      await expect(
+        themeMenu.getSystemThemeOption(),
+        "theme menu should be open"
+      ).toBeVisible();
+      await getOption().click();
+      await landingPage.expectTheme(theme);
     }
   });
 

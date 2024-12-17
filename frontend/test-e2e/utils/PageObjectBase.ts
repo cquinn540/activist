@@ -1,18 +1,10 @@
-import type { Page } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
 
-export default class PageObjectBase {
+export default abstract class PageObjectBase {
   public readonly page: Page;
-  public readonly pageName?: string;
-  public readonly pageURL?: string;
 
-  constructor(page: Page, pageName: string, pageURL: string) {
+  constructor(page: Page) {
     this.page = page;
-    this.pageName = pageName;
-    this.pageURL = pageURL;
-  }
-
-  public getPageName(): string {
-    return this.pageName ?? "Unknown Page";
   }
 
   public async isMobile(): Promise<boolean> {
@@ -24,7 +16,7 @@ export default class PageObjectBase {
     return isMobileViewport && isMobileEmulation;
   }
 
-  public async currentTheme(): Promise<string> {
-    return (await this.page.locator("html").getAttribute("class")) ?? "";
+  public async expectTheme(theme: string): Promise<void> {
+    await expect(this.page.locator("html")).toHaveClass(theme);
   }
 }

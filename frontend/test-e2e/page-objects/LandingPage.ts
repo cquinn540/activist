@@ -1,8 +1,40 @@
 import type { Locator, Page } from "@playwright/test";
 import locales from "../../locales";
-import { PageObjectBase } from "../utils/PageObjectBase";
+import PageObjectBase from "../utils/PageObjectBase";
 import { HeaderWebsite } from "../component-objects/HeaderWebsite";
 import { Navigation } from "../component-objects/Navigation";
+import {
+  LandingHeaderMobile,
+  LandingHeaderWeb,
+  type LandingHeader,
+} from "../component-objects/LandingHeader";
+
+export interface ILandingPage extends PageObjectBase {
+  header: LandingHeader;
+}
+
+export class LandingPageWeb extends PageObjectBase implements ILandingPage {
+  public readonly header: LandingHeaderWeb;
+
+  constructor(page: Page) {
+    super(page);
+    this.header = new LandingHeaderWeb(page);
+  }
+}
+
+export class LandingPageMobile extends PageObjectBase implements ILandingPage {
+  public readonly header: LandingHeaderMobile;
+
+  constructor(page: Page) {
+    super(page);
+    this.header = new LandingHeaderMobile(page);
+  }
+}
+
+export function createLandingPage(
+  page: Page,
+  isMobile: boolean
+): ILandingPage {}
 
 // Centralized locator management
 const locators = {
