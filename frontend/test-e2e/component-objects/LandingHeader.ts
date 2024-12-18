@@ -11,6 +11,7 @@ export interface LandingHeader {
   clickSignInLink: () => Promise<void>;
   clickSignUpLink: () => Promise<void>;
   getThemeMenu: () => Promise<ThemeMenu>;
+  getLanguageMenu: () => Promise<LanguageMenu>;
 }
 
 const ACTIVIST_LANDING_LINK_NAME =
@@ -60,6 +61,10 @@ export class LandingHeaderWeb implements LandingHeader {
 
   async getThemeMenu(): Promise<ThemeMenu> {
     return new Promise(() => this.themeMenu);
+  }
+
+  async getLanguageMenu(): Promise<LanguageMenu> {
+    return new Promise(() => this.languageMenu);
   }
 }
 
@@ -112,5 +117,10 @@ export class LandingHeaderMobile implements LandingHeader {
   async getThemeMenu() {
     const sidebar = await this.openSideBar();
     return sidebar.themeMenu;
+  }
+
+  async getLanguageMenu() {
+    const sidebar = await this.openSideBar();
+    return sidebar.languageMenu;
   }
 }

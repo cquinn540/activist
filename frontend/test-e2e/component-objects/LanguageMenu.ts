@@ -1,4 +1,5 @@
 import type { Locator } from "playwright";
+import type { LocaleName } from "~/locales";
 
 export class LanguageMenu {
   public readonly root: Locator;
@@ -11,27 +12,9 @@ export class LanguageMenu {
     });
   }
 
-  get germanOption(): Locator {
+  getOption(name: LocaleName): Locator {
     return this.root.getByRole("menuitem", {
-      name: /deutsch/i,
-    });
-  }
-
-  get spanishOption(): Locator {
-    return this.root.getByRole("menuitem", {
-      name: /español/i,
-    });
-  }
-
-  get frenchOption(): Locator {
-    return this.root.getByRole("menuitem", {
-      name: /français/i,
-    });
-  }
-
-  get portugueseOption(): Locator {
-    return this.root.getByRole("menuitem", {
-      name: /português/i,
+      name: name,
     });
   }
 }

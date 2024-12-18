@@ -6,7 +6,7 @@ export interface Locale {
   isCatchallLocale?: boolean;
 }
 
-const locales: Locale[] = [
+const locales = [
   {
     code: "en",
     language: "en-US",
@@ -38,6 +38,9 @@ const locales: Locale[] = [
     name: "Português",
     file: "pt.json",
   },
-];
+] as const;
 
-export default locales;
+export type LocaleCode = (typeof locales)[number]["code"];
+export type LocaleName = (typeof locales)[number]["name"];
+
+export default locales as unknown as Locale[];

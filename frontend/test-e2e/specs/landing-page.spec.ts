@@ -1,9 +1,10 @@
+import type { LocaleCode, LocaleName } from "~/locales";
 import {
   createLandingPage,
   LandingPageMobile,
   LandingPageWeb,
 } from "../page-objects/LandingPage";
-import { LandingPage, expect, test } from "../fixtures/test-fixtures";
+import { expect, test } from "../fixtures/test-fixtures";
 import { runAccessibilityTest } from "../utils/accessibilityTesting";
 import { ROADMAP_LINK_NAME } from "../utils/accessible-names";
 
@@ -12,6 +13,72 @@ test.beforeEach(({ page }) => {
 });
 
 test.describe("Landing Page", () => {
+  // MARK: Landing Page
+
+  test('Title should contain "activist"', async ({ page }) => {
+    expect(page.title()).toContain("activist");
+  });
+
+  test.skip("Can request access", async ({ page }) => {
+    const requestAccessLink = page.locator("#request-access");
+    await expect(requestAccessLink).toHaveAttribute(
+      "href",
+      "https://app.formbricks.com/s/clvn9ywe21css8wqpt1hee57a"
+    );
+  });
+
+  test("Can navigate to Organizations page", async ({ page }) => {
+    const organizationsLink = page.getByRole("link", {
+      name: /view the organizations section of the activist platform/i,
+    });
+    await organizationsLink.click();
+    page.waitForURL("**/organizations");
+    expect(page.url()).toContain("/organizations");
+  });
+
+  test("Can navigate to Events page", async ({ page }) => {
+    const eventsLink = page.getByRole("link", {
+      name: /view the events section of the activist platform/i,
+    });
+    await eventsLink.click();
+    page.waitForURL("**/events");
+    expect(page.url()).toContain("/events");
+  });
+
+  test("Important links have correct urls", async ({ page }) => {
+    const links = [
+      {
+        name: /learn more about getting involved in an activist organization/i,
+        url: "https://docs.activist.org/activist",
+      },
+      {
+        name: /learn more about organizing an activist organization/i,
+        url: "https://docs.activist.org/activist",
+      },
+      {
+        name: /learn more about growing an activist organization/i,
+        url: "https://docs.activist.org/activist",
+      },
+      {
+        name: /learn more about activist\.org and how it functions/i,
+        url: "https://docs.activist.org/activist",
+      },
+      {
+        name: /become a supporter of activist/i,
+        url: "/supporters/join",
+      },
+      {
+        name: /view all supporters of activist/i,
+        url: "https://docs.activist.org/activist/organization/community/supporters",
+      },
+    ];
+
+    for (const { name, url } of links) {
+      const link = page.getByRole("link", { name });
+      await expect(link).toHaveAttribute("href", url);
+    }
+  });
+
   // MARK: Header
 
   test("Desktop layout uses desktop header", async ({ page, isMobile }) => {
@@ -35,7 +102,7 @@ test.describe("Landing Page", () => {
     await landingPage.header.roadmapLink.click();
     await page.waitForURL("**/about/roadmap");
 
-    expect(page.url).toContain("/about/roadmap");
+    expect(page.url()).toContain("/about/roadmap");
   });
 
   test("Roadmap link is not visible on mobile", async ({ page, isMobile }) => {
@@ -52,7 +119,7 @@ test.describe("Landing Page", () => {
     await landingPage.header.clickSignInLink();
     await page.waitForURL("**/auth/sign-in");
 
-    expect(page.url).toContain("/auth/sign-in");
+    expect(page.url()).toContain("/auth/sign-in");
   });
 
   test("Can navigate to Sign Up page", async ({ page, isMobile }) => {
@@ -61,7 +128,7 @@ test.describe("Landing Page", () => {
     await landingPage.header.clickSignUpLink();
     await page.waitForURL("**/auth/sign-up");
 
-    expect(page.url).toContain("/auth/sign-up");
+    expect(page.url()).toContain("/auth/sign-up");
   });
 
   test("Can change themes", async ({ page, isMobile }) => {
@@ -83,69 +150,67 @@ test.describe("Landing Page", () => {
       await themeMenu.toggleOpenButton.click();
       await expect(
         themeMenu.getSystemThemeOption(),
-        "theme menu should be open"
+        "Theme menu should be open"
       ).toBeVisible();
       await getOption().click();
       await landingPage.expectTheme(theme);
     }
   });
 
-  // Test that the language dropdown is visible and functional.
-  test("Language dropdown options are visible", async ({ landingPage }) => {
-    const visibleOptions = await landingPage.getVisibleLanguageOptions();
-    expect(visibleOptions.length).toBeGreaterThan(0);
-    for (const option of visibleOptions) {
-      await expect(option).toBeVisible();
-    }
-  });
+  test("Can change language", async ({ page, isMobile }) => {
+    const landingPage = createLandingPage(page, isMobile);
 
-  // MARK: Landing Page
+    const languages: {
+      path: LocaleCode;
+      headingText: string;
+      option: LocaleName;
+    }[] = [
+      {
+        path: "es",
+        headingText: "Donde emepezamos.",
+        option: "Español",
+      },
 
-  // Test that the title of the landing page contains "activist".
-  test('Title should contain "activist"', async ({ landingPage }) => {
-    const pageTitle = await landingPage.title();
-    expect(pageTitle).toContain("activist");
-  });
+      {
+        path: "de",
+        headingText: "Wo wir anfangen.",
+        option: "Deutsch",
+      },
+      {
+        path: "fr",
+        headingText: "Notre point de départ.",
+        option: "Français",
+      },
+      {
+        path: "pt",
+        headingText: "Onde nós começamos.",
+        option: "Português",
+      },
+      {
+        path: "en",
+        headingText: "Where we start.",
+        option: "English",
+      },
+    ];
 
-  // Test that the landing page contains the request access link.
-  test.skip("Splash should contain the request access link", async ({
-    landingPage,
-  }) => {
-    const requestAccessLink = landingPage.requestAccessLink;
-    expect(await requestAccessLink.getAttribute("href")).toBe(
-      LandingPage.urls.REQUEST_ACCESS_URL
-    );
-  });
+    for (let i = 0; i < languages.length; i += 1) {
+      const { path, headingText, option } = languages[i];
 
-  // Test that the view organizations button is visible and navigates to the organizations page.
-  test("View organizations button should be visible and functional", async ({
-    landingPage,
-  }) => {
-    const isVisible = await landingPage.isViewOrganizationsButtonVisible();
-    expect(isVisible).toBe(true);
+      const languageMenu = await landingPage.header.getLanguageMenu();
+      await languageMenu.toggleOpenButton.click();
 
-    await landingPage.navigateToViewOrganizations();
-    expect(landingPage.url()).toContain("/organizations");
-  });
+      const firstOption =
+        i === 0
+          ? languageMenu.getOption("Deutsch")
+          : languageMenu.getOption("English");
+      await expect(firstOption, "Language menu should be open").toBeVisible();
 
-  // Test that the view events button is visible and navigates to the events page.
-  test("View events button should be visible and functional", async ({
-    landingPage,
-  }) => {
-    const isVisible = await landingPage.isViewEventsButtonVisible();
-    expect(isVisible).toBe(true);
+      await languageMenu.getOption(option).click();
 
-    await landingPage.navigateToViewEvents();
-    expect(landingPage.url()).toContain("/events");
-  });
-
-  // Test that all important links are visible on the landing page.
-  test("All important links should be visible on the landing page", async ({
-    landingPage,
-  }) => {
-    const importantLinks = await landingPage.getImportantLinks();
-    for (const link of importantLinks) {
-      await expect(link).toBeVisible();
+      await page.waitForURL(`**/${path}`);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+        headingText
+      );
     }
   });
 
@@ -153,9 +218,13 @@ test.describe("Landing Page", () => {
 
   // Note: Check to make sure that this is eventually done for light and dark modes.
   test("Landing Page has no detectable accessibility issues", async ({
-    landingPage,
+    page,
   }, testInfo) => {
-    const violations = await runAccessibilityTest(landingPage, testInfo);
+    const violations = await runAccessibilityTest(
+      "Landing Page",
+      page,
+      testInfo
+    );
     expect.soft(violations, "Accessibility violations found:").toHaveLength(0);
 
     if (violations.length > 0) {

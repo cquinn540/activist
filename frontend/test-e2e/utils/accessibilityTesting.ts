@@ -1,9 +1,9 @@
 import type { Page, TestInfo } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import type { PageObjectBase } from "./PageObjectBase";
 
 export async function runAccessibilityTest(
-  page: Page | PageObjectBase,
+  pageName: string,
+  page: Page,
   testInfo: TestInfo
 ) {
   const results = await new AxeBuilder({ page })
@@ -14,8 +14,6 @@ export async function runAccessibilityTest(
     body: JSON.stringify(results, null, 2),
     contentType: "application/json",
   });
-  const pageName =
-    "getPageName" in page ? await page.getPageName() : "Unknown Page";
   console.log(`Accessibility test completed for: ${pageName}`);
   console.log(`Violations found: ${results.violations.length}`);
 
