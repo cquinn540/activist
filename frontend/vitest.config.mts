@@ -9,9 +9,9 @@ export default defineVitestConfig({
       VITEST: "true",
     },
     environment: "nuxt",
-    exclude: [
-      "**/node_modules/**",
-      "./test-e2e", // exclude e2e tests
+    include: [
+      "./test/**/*.{test,spec}.?(c|m)[jt]s",
+      "./tests/**/*.{test,spec}.?(c|m)[jt]s",
     ],
     globals: true,
     setupFiles: ["./test/setup.ts"],

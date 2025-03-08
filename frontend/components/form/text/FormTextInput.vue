@@ -19,6 +19,7 @@
       :value="modelValue"
       :placeholder="placeholder"
       :type="refInputType"
+      :data-testid="placeholder"
     />
     <span
       v-for="(i, index) in icons"
@@ -57,6 +58,7 @@ export interface Props {
   isIconVisible?: boolean;
   icons?: string[];
   error?: boolean;
+  dataTestId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
