@@ -4702,6 +4702,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vee-validate/zod@npm:^4.15.0":
+  version: 4.15.0
+  resolution: "@vee-validate/zod@npm:4.15.0"
+  dependencies:
+    type-fest: "npm:^4.8.3"
+    vee-validate: "npm:4.15.0"
+  peerDependencies:
+    zod: ^3.24.0
+  checksum: 10c0/c298f74b07427155a18d56b8ca41fd86ce5ecdecbf8664b54d08dcf7a8ea23026c902f0af2247c5c05e9492657fc27a7f6d2c9acfa365986370e3f85a824819e
+  languageName: node
+  linkType: hard
+
 "@vercel/nft@npm:^0.29.2":
   version: 0.29.2
   resolution: "@vercel/nft@npm:0.29.2"
@@ -4995,6 +5007,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/devtools-api@npm:^7.5.2":
+  version: 7.7.6
+  resolution: "@vue/devtools-api@npm:7.7.6"
+  dependencies:
+    "@vue/devtools-kit": "npm:^7.7.6"
+  checksum: 10c0/2f616292f63fa20dab412ccddebfbd794af73a3eee0942ac39f1c72092bfc35c288b26a9ea058041e7ce5781159bf47df004e415a03473aa85223835c9b5d072
+  languageName: node
+  linkType: hard
+
 "@vue/devtools-core@npm:7.6.8":
   version: 7.6.8
   resolution: "@vue/devtools-core@npm:7.6.8"
@@ -5057,12 +5078,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/devtools-kit@npm:^7.7.6":
+  version: 7.7.6
+  resolution: "@vue/devtools-kit@npm:7.7.6"
+  dependencies:
+    "@vue/devtools-shared": "npm:^7.7.6"
+    birpc: "npm:^2.3.0"
+    hookable: "npm:^5.5.3"
+    mitt: "npm:^3.0.1"
+    perfect-debounce: "npm:^1.0.0"
+    speakingurl: "npm:^14.0.1"
+    superjson: "npm:^2.2.2"
+  checksum: 10c0/8025e894207ae0d8a4e82965a9a0ca7c5a3e98b3540616dc7f5de19af7fbfedc2398913786cf129f89509a7be2b0a18f8913682fa9a15669e748834ea2843546
+  languageName: node
+  linkType: hard
+
 "@vue/devtools-shared@npm:^7.6.8, @vue/devtools-shared@npm:^7.7.2":
   version: 7.7.2
   resolution: "@vue/devtools-shared@npm:7.7.2"
   dependencies:
     rfdc: "npm:^1.4.1"
   checksum: 10c0/6399135da41a91f48c3db7c59cedb01ad331af7784ef0877c15c669ad5a5d1cce68f73d50d81f85a31a90b0d6323ff807ebe5b1fb041d1e86932f2c983a0cdad
+  languageName: node
+  linkType: hard
+
+"@vue/devtools-shared@npm:^7.7.6":
+  version: 7.7.6
+  resolution: "@vue/devtools-shared@npm:7.7.6"
+  dependencies:
+    rfdc: "npm:^1.4.1"
+  checksum: 10c0/4087bb9fbdb265c489e73452238062815a98f3cdc1c8816ed7a7a3a0c8f904802906a84fc9c6deccec3cec3a2f577ee871d24c2496b7b7e950fec6f5650e9117
   languageName: node
   linkType: hard
 
@@ -5327,6 +5372,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     "@types/zxcvbn": "npm:4.4.5"
     "@unocss/reset": "npm:65.4.3"
+    "@vee-validate/zod": "npm:^4.15.0"
     "@vue/test-utils": "npm:2.4.6"
     "@vueuse/core": "npm:12.5.0"
     "@vueuse/math": "npm:12.7.0"
@@ -5370,6 +5416,7 @@ __metadata:
     unocss: "npm:65.4.3"
     uuid: "npm:11.0.5"
     v-calendar: "npm:3.1.2"
+    vee-validate: "npm:^4.15.0"
     vite: "npm:6.1.6"
     vitest: "npm:3.0.5"
     vue: "npm:3.5.13"
@@ -15507,7 +15554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superjson@npm:^2.2.1":
+"superjson@npm:^2.2.1, superjson@npm:^2.2.2":
   version: 2.2.2
   resolution: "superjson@npm:2.2.2"
   dependencies:
@@ -15956,6 +16003,13 @@ __metadata:
   version: 4.37.0
   resolution: "type-fest@npm:4.37.0"
   checksum: 10c0/5bad189f66fbe3431e5d36befa08cab6010e56be68b7467530b7ef94c3cf81ef775a8ac3047c8bbda4dd3159929285870357498d7bc1df062714f9c5c3a84926
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^4.8.3":
+  version: 4.41.0
+  resolution: "type-fest@npm:4.41.0"
+  checksum: 10c0/f5ca697797ed5e88d33ac8f1fec21921839871f808dc59345c9cf67345bfb958ce41bd821165dbf3ae591cedec2bf6fe8882098dfdd8dc54320b859711a2c1e4
   languageName: node
   linkType: hard
 
@@ -16646,6 +16700,18 @@ __metadata:
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
   checksum: 10c0/f15d588d79f3675135ba783c91a4083dcd290a2a5be9fcb6514220a1634e23df116847b1cc51f66bfb0644cf9353b2abb7815ae499bab06e46dd33c1a6bf1f4f
+  languageName: node
+  linkType: hard
+
+"vee-validate@npm:4.15.0, vee-validate@npm:^4.15.0":
+  version: 4.15.0
+  resolution: "vee-validate@npm:4.15.0"
+  dependencies:
+    "@vue/devtools-api": "npm:^7.5.2"
+    type-fest: "npm:^4.8.3"
+  peerDependencies:
+    vue: ^3.4.26
+  checksum: 10c0/5ea7318f92cd724a9c6999bc65c6cc589818355fd7d0860807e1e2b70be2ccd3a199e1d3892cfa33dfa0a29c6ccaae91d5c2f2f3f69a6cba37292287607e68f3
   languageName: node
   linkType: hard
 

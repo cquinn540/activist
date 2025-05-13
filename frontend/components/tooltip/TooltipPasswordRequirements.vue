@@ -8,18 +8,18 @@
     }}</span>
     <div
       v-for="rule in rules"
-      :key="rule.message"
-      :data-testid="rule.message"
+      :key="rule.name"
+      :data-testid="rule.name"
       class="flex items-center space-x-2 px-2"
     >
       <Icon
         aria-hidden="false"
-        :aria-labelledby="rule.message"
+        :aria-labelledby="rule.name"
         :name="rule.isValid ? IconMap.CIRCLE_CHECK_FILL : IconMap.CIRCLE_X_FILL"
         size="0.9em"
         :style="{ color: rule.isValid ? '#198754' : '#BA3D3B' }"
       />
-      <title :id="rule.message" class="sr-only">
+      <title :id="rule.name" class="sr-only">
         {{
           rule.isValid
             ? $t(
@@ -30,35 +30,35 @@
               )
         }}
       </title>
-      <span class="truncate text-sm">{{
-        $t(passwordRequirementsDict[rule.message])
-      }}</span>
+      <span class="truncate text-sm">{{ $t(translationKeys[rule.name]) }}</span>
     </div>
   </TooltipBase>
 </template>
 
 <script setup lang="ts">
-import type { PasswordRules } from "~/types/password-rules";
-
 import { IconMap } from "~/types/icon-map";
+import {
+  LENGTH,
+  HAS_LOWERCASE,
+  HAS_UPPERCASE,
+  HAS_NUMBER,
+  HAS_SPECIAL_CHAR,
+  type PasswordRule,
+} from "~/types/password-rules";
 
 defineProps<{
-  rules: PasswordRules[];
+  rules: PasswordRule[];
 }>();
 
-// Dictionary is used to assure that the full keys are present and picked up by the i18n checks.
-const passwordRequirementsDict: { [key: string]: string } = {
-  "capital-letters":
-    "i18n.components.tooltip_password_requirements.capital_letters",
-  "contains-numbers":
-    "i18n.components.tooltip_password_requirements.contains_numbers",
-  "contains-special-chars":
-    "i18n.components.tooltip_password_requirements.contains_special_chars",
-  "lower-case-letters":
+const translationKeys = {
+  [LENGTH]: "i18n.components.tooltip_password_requirements.number_of_chars",
+  [HAS_LOWERCASE]:
     "i18n.components.tooltip_password_requirements.lower_case_letters",
-  "number-of-chars":
-    "i18n.components.tooltip_password_requirements.number_of_chars",
-  "password-rules-message":
-    "i18n.components.tooltip_password_requirements.password_rules_message",
+  [HAS_UPPERCASE]:
+    "i18n.components.tooltip_password_requirements.capital_letters",
+  [HAS_NUMBER]:
+    "i18n.components.tooltip_password_requirements.contains_numbers",
+  [HAS_SPECIAL_CHAR]:
+    "i18n.components.tooltip_password_requirements.contains_special_chars",
 };
 </script>

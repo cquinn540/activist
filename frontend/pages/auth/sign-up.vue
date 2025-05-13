@@ -4,50 +4,50 @@
     <form @submit.prevent="signUp" @enter="signUp" class="space-y-4">
       <div class="col">
         <FormTextInput
-          @input="userName = $event.target.value"
+          v-model="userName"
           id="sign-up-username"
-          :value="userName"
           :label="$t('i18n.pages.auth._global.enter_a_user_name')"
           :data-testid="$t('i18n.pages.auth._global.enter_a_user_name')"
+          v-bind="userNameAttrs"
         />
       </div>
       <div>
         <FormPasswordInput
-          @input="handlePasswordInput"
+          v-model="password"
           @blur="isPasswordFocused = false"
           @focus="isPasswordFocused = true"
           id="sign-up-password"
-          :value="password"
           :label="$t('i18n._global.enter_password')"
           :hasError="showPasswordError.border"
+          v-bind="passwordAttrs"
         />
       </div>
       <IndicatorPasswordStrength :password-value="password" />
       <TooltipPasswordRequirements
-        v-if="showPasswordError.tooltip"
-        :rules="rules"
+        v-if="showPasswordError.tooltipErrors"
+        :rules="showPasswordError.tooltipErrors"
       />
       <div>
         <FormPasswordInput
-          @input="confirmPassword = $event.target.value"
+          v-model="confirmPassword"
           id="sign-up-confirm-password"
-          :value="confirmPassword"
           :label="$t('i18n._global.repeat_password')"
+          v-bind="confirmPasswordAttrs"
         >
           <template #icons>
             <span>
               <Icon
-                :name="doPasswordsMatch ? IconMap.CHECK : IconMap.X_LG"
+                :name="errors.confirmPassword ? IconMap.X_LG : IconMap.CHECK"
                 size="1.2em"
-                :color="doPasswordsMatch ? '#3BA55C' : '#BA3D3B'"
+                :color="errors.confirmPassword ? '#BA3D3B' : '#3BA55C'"
                 aria-hidden="false"
                 aria-labelledby="sign-up-confirm-password-match"
               />
               <title id="sign-up-confirm-password-match" class="sr-only">
                 {{
-                  doPasswordsMatch
-                    ? $t("i18n.pages.auth._global.passwords_match")
-                    : $t("i18n.pages.auth._global.passwords_do_not_match")
+                  errors.confirmPassword
+                    ? $t("i18n.pages.auth._global.passwords_do_not_match")
+                    : $t("i18n.pages.auth._global.passwords_match")
                 }}
               </title>
             </span>
@@ -57,11 +57,7 @@
       <div class="flex flex-col space-y-3">
         <FriendlyCaptcha />
         <div class="flex flex-row items-center">
-          <FormCheckbox
-            @update:modelValue="hasRed = $event"
-            :modelValue="hasRed"
-            value="yes"
-          />
+          <FormCheckbox v-model="hasReadTerms" value="yes" />
           <p class="flex flex-wrap pl-2">
             {{ $t("i18n.pages._global.terms_of_service_pt_1") }}
             <NuxtLink
@@ -95,37 +91,50 @@
 </template>
 
 <script setup lang="ts">
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import { object, string } from "zod";
+
+import type { PasswordRule, PasswordRuleName } from "~/types/password-rules";
+
+import { createRulesList, passwordField } from "~/forms/fields/passwordField";
 import { IconMap } from "~/types/icon-map";
 
 const localePath = useLocalePath();
 
-const userName = ref("");
-const password = ref("");
-const confirmPassword = ref("");
-const hasRed = ref(false);
+const { defineField, errorBag, errors } = useForm({
+  validationSchema: toTypedSchema(
+    object({
+      userName: string().nonempty().default(""),
+      password: passwordField,
+      confirmPassword: string().default(""),
+    }).refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"],
+    })
+  ),
+});
+
+const [userName, userNameAttrs] = defineField("userName");
+const [password, passwordAttrs] = defineField("password");
+const [confirmPassword, confirmPasswordAttrs] = defineField("confirmPassword");
+
+const hasReadTerms = ref(false);
 const isPasswordFocused = ref(false);
 
-const { rules, isAllRulesValid, checkRules, isPasswordMatch } =
-  usePasswordRules();
+const showPasswordError = computed<{
+  border: boolean;
+  tooltipErrors: PasswordRule[];
+}>(() => {
+  const error = password.value!.length > 0 && !!errorBag.value.password;
 
-const doPasswordsMatch = computed<boolean>(() =>
-  isPasswordMatch(password.value, confirmPassword.value)
-);
-
-const showPasswordError = computed<{ border: boolean; tooltip: boolean }>(
-  () => {
-    const error = password.value.length > 0 && !isAllRulesValid.value;
-    return {
-      border: !isPasswordFocused.value && error,
-      tooltip: isPasswordFocused.value && error,
-    };
-  }
-);
-
-const handlePasswordInput = (event: Event & { target: HTMLInputElement }) => {
-  password.value = event.target.value;
-  checkRules(event);
-};
+  return {
+    border: !isPasswordFocused.value && error,
+    tooltipErrors:
+      isPasswordFocused.value && error
+        ? createRulesList(errorBag.value.password as PasswordRuleName[])
+        : [],
+  };
+});
 
 const signUp = () => {};
 </script>

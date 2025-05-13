@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <FormTextInput
+    v-model="model"
+    @blur="$emit('blur')"
     :id="id"
     :label="label"
     :hasError="hasError"
@@ -20,6 +22,9 @@
 
 <script setup lang="ts">
 import { IconMap } from "~/types/icon-map";
+
+const model = defineModel<string>();
+defineEmits(["blur"]);
 
 export interface Props {
   id: string;

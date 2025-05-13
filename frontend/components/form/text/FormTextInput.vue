@@ -19,6 +19,7 @@
       class="border-box relative inline-flex select-none items-center text-left text-distinct-text"
     >
       <input
+        v-model="model"
         @focus="shrinkLabel = true"
         @blur="handleBlur"
         :id="id"
@@ -60,6 +61,9 @@ defineOptions({
   inheritAttrs: false,
 });
 
+const model = defineModel<string>();
+const emit = defineEmits(["blur"]);
+
 export interface Props {
   id: string;
   label: string;
@@ -77,5 +81,6 @@ const handleBlur = (event: FocusEvent) => {
   if (!target?.value) {
     shrinkLabel.value = false;
   }
+  emit("blur");
 };
 </script>
